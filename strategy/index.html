@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head><meta http-equiv="Content-Security-Policy" content="connect-src 'self' https://rahindpqzsrizmmmmfdo.supabase.co wss://rahindpqzsrizmmmmfdo.supabase.co; img-src 'self' data: blob: https://rahindpqzsrizmmmmfdo.supabase.co; media-src 'self' blob: https://rahindpqzsrizmmmmfdo.supabase.co; frame-src 'self' blob:; worker-src 'self' blob:; form-action 'self'"><meta name="robots" content="noindex,nofollow">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Стратегия — OKR</title>
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="theme.css?v=20261017b">
+<style>
+  html, body { margin: 0; padding: 0; background: #F2F4F1; }
+  #root { min-height: 100vh; }
+</style>
+<script>
+  // Evolution CCI · модуль «Стратегия»: приложение OKR-Tree2026 без изменений, данные — в базе Evolution CCI.
+  // Запросы к старому проекту Supabase перенаправляются в Evolution CCI с токеном вошедшего пользователя;
+  // права считает база (okr_perms) из ролей портала, пароли ролей старого приложения не используются.
+  (function () {
+    var H = null;
+    try { H = window.parent !== window && window.parent.__ECCI_OKR; } catch (e) {}
+    if (!H) { window.__OKR_NO_HOST = true; return; }
+    var OLD = "https://awwhrlenhqoreagzfymn.supabase.co";
+    var nativeFetch = window.fetch.bind(window);
+    window.fetch = async function (input, init) {
+      var url = typeof input === "string" ? input : (input && input.url) || String(input);
+      if (url.indexOf(OLD) !== 0) return nativeFetch(input, init);
+      var opts = Object.assign({}, init || {});
+      var headers = new Headers(opts.headers || (typeof input === "object" && input.headers) || {});
+      headers.set("apikey", H.key);
+      headers.set("Authorization", "Bearer " + (await H.token()));
+      opts.headers = headers;
+      if (!opts.method && typeof input === "object" && input.method) opts.method = input.method;
+      if (opts.body === undefined && typeof input === "object" && input.body) opts.body = await input.clone().text();
+      var res = await nativeFetch(H.url + url.slice(OLD.length), opts);
+      if (!res.ok) H.onError(res.status, url.slice(OLD.length));
+      return res;
+    };
+    // Управление привилегиями — в портале (Администратор системы → Привилегии → Стратегия), во фрейме вкладку прячем
+    // язык — в шапке платформы; скругление углов задаёт тема платформы (theme.css)
+    var HIDE = ["Управление привилегиями", "Manage privileges", "\uD83C\uDF10 RU / EN", "\u25A2 Мягко", "\u25FB Строго", "\u25A2 Soft", "\u25FB Sharp"];
+    var hideTabs = function () {
+      document.querySelectorAll("button, a, [role=tab]").forEach(function (el) {
+        var tx = (el.textContent || "").trim();
+        if (HIDE.indexOf(tx) >= 0 && el.style.display !== "none") el.style.display = "none";
+      });
+    };
+    // Вход — только через портал: блок «Вход / роль» в боковой панели не показываем
+    var css = document.createElement("style");
+    css.textContent = ".okr-aside > div > :first-child{display:none!important}" + (H.view === "projects" ? ".okr-aside > div > :nth-child(2){display:none!important}" : "");
+    document.head.appendChild(css);
+    // раздел «Проекты»: сразу открыть список проектов
+    var opened = H.view !== "projects";
+    var openProjects = function () {
+      if (opened) return;
+      var btn = Array.prototype.find.call(document.querySelectorAll(".okr-aside button"), function (b) { return /^(Проекты|Projects)$/.test((b.textContent || "").trim()); });
+      if (btn) { opened = true; btn.click(); }
+    };
+    // «Поиск» (29.10.2026): строка поиска во вкладке «Протоколы» — справа от «+ Добавить протокол».
+    // Начали печатать или нажали — открывается окно поиска портала (задачи деревьев, задачи и темы протоколов).
+    var S = null; try { S = window.parent.__ECCI_SEARCH; } catch (e) {}
+    var en = H.lang === "en";
+    var injectSearch = function () {
+      if (!S || !S.can() || document.getElementById("ecci-srch")) return;
+      var add = Array.prototype.find.call(document.querySelectorAll("button"), function (b) { return /Добавить протокол|Add protocol/.test(b.textContent || ""); });
+      if (!add || !add.parentElement) return;
+      var wrap = document.createElement("label");
+      wrap.id = "ecci-srch";
+      wrap.title = en ? "Search track tasks, protocol tasks and topics (Ctrl+K)" : "Поиск по задачам треков, задачам и темам протоколов (Ctrl+K)";
+      wrap.innerHTML = '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M13 13l4.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>'
+        + '<input type="search" autocomplete="off" spellcheck="false"><kbd>' + (/Mac|iPhone|iPad/.test(navigator.platform || "") ? "⌘K" : "Ctrl K") + '</kbd>';
+      var inp = wrap.querySelector("input");
+      inp.placeholder = en ? "Search tasks and protocols" : "Поиск по задачам и протоколам";
+      inp.setAttribute("aria-label", inp.placeholder);
+      var go = function () { var q = inp.value; inp.value = ""; inp.blur(); S.open(q); };
+      inp.addEventListener("input", function () { if (inp.value.trim()) go(); });
+      inp.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); go(); } });
+      inp.addEventListener("mousedown", function (e) { e.preventDefault(); go(); });
+      add.parentElement.appendChild(wrap);
+    };
+    var srchCss = document.createElement("style");
+    srchCss.textContent = "#ecci-srch{display:inline-flex;align-items:center;gap:8px;margin-left:auto;min-width:300px;height:36px;padding:0 8px 0 12px;border:1.5px solid #004643;border-radius:999px;background:#fff;box-shadow:0 0 0 3px rgba(0,70,67,.10);cursor:text;color:#5C6964}"
+      + "#ecci-srch:hover,#ecci-srch:focus-within{background:rgba(0,70,67,.06);box-shadow:0 0 0 4px rgba(0,70,67,.14)}"
+      + "#ecci-srch svg{width:16px;height:16px;flex:0 0 auto;color:#004643}"
+      + "#ecci-srch input{flex:1 1 auto;min-width:0;border:0;outline:0;background:transparent;font:inherit;font-size:13px;color:#18211E;cursor:text}"
+      + "#ecci-srch input::placeholder{color:#5C6964}"
+      + "#ecci-srch kbd{font-family:'JetBrains Mono',monospace;font-size:10.5px;padding:2px 6px;border:1px solid #D8DDD8;border-radius:6px;background:#E9ECE8;color:#5C6964}"
+      + "@media (max-width:900px){#ecci-srch{min-width:0;flex:1 1 100%;margin-left:0}#ecci-srch kbd{display:none}}";
+    document.head.appendChild(srchCss);
+    document.addEventListener("keydown", function (e) {
+      if ((e.ctrlKey || e.metaKey) && !e.altKey && /^[kKлЛ]$/.test(e.key) && S && S.can()) { e.preventDefault(); S.open(""); }
+    });
+    new MutationObserver(function () { hideTabs(); openProjects(); injectSearch(); }).observe(document.documentElement, { childList: true, subtree: true });
+    // «Поиск» портала (29.10.2026): переход к находке. Портал кладёт цель в window.__ECCI_OKR_OPEN =
+    // { track, tab: "tree" | "protocols", date?, node?, title? }; здесь по шагам нажимаем трек, вкладку, протокол / находим задачу.
+    var norm = function (v) { return String(v || "").toLowerCase().replace(/ё/g, "е").replace(/[^a-zа-я0-9]/g, ""); };
+    var txt = function (el) { return (el.textContent || "").trim(); };
+    var on = function (el) { return /^✓/.test(txt(el)); };
+    var go = null, goAt = 0, step = 0, wait = 0;
+    var done = function (msg) {
+      try { if (window.parent.__ECCI_OKR_OPEN === go) window.parent.__ECCI_OKR_OPEN = null; } catch (e) {}
+      if (msg && H.toast) H.toast(msg);
+      go = null;
+    };
+    var flash = function (el) {
+      try { el.scrollIntoView({ block: "center", inline: "center", behavior: "smooth" }); } catch (e) {}
+      var o = el.style.outline, f = el.style.outlineOffset, r = el.style.borderRadius;
+      el.style.outline = "3px solid #E0A526"; el.style.outlineOffset = "3px"; el.style.borderRadius = el.style.borderRadius || "8px";
+      setTimeout(function () { el.style.outline = o; el.style.outlineOffset = f; el.style.borderRadius = r; }, 4000);
+    };
+    setInterval(function () {
+      var o = null;
+      try { o = window.parent.__ECCI_OKR_OPEN; } catch (e) {}
+      if (o && o !== go) { go = o; goAt = Date.now(); step = 0; wait = 0; }
+      if (!go) return;
+      if (Date.now() - goAt > 12000) { done(go.tab === "tree" ? "Задача не видна в дереве: возможно, её ветка свёрнута или выполненные задачи скрыты." : "Протокол не найден на экране."); return; }
+      if (wait > Date.now()) return;
+      var btns = Array.prototype.slice.call(document.querySelectorAll("button"));
+      if (step === 0) {          // трек в боковой панели
+        var want = norm(go.track);
+        var tb = Array.prototype.find.call(document.querySelectorAll(".okr-aside button"), function (b) { return norm(txt(b)) === want; });
+        if (!tb) return;
+        if (!on(tb)) { tb.click(); wait = Date.now() + 600; }
+        step = 1; return;
+      }
+      if (step === 1) {          // вкладка «OKR-дерево» / «Протоколы»
+        var re = go.tab === "protocols" ? /^(✓\s*)?(Протоколы|Protocols)$/ : /^(✓\s*)?(OKR-дерево|OKR tree)$/;
+        var tab = btns.find(function (b) { return re.test(txt(b)); });
+        if (!tab) return;
+        if (!on(tab)) { tab.click(); wait = Date.now() + 600; }
+        step = 2; return;
+      }
+      if (go.tab === "protocols") {   // строка реестра протоколов с датой → двойной клик открывает карточку
+        if (!go.date) { done(); return; }
+        var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(go.date), d = m ? m[3] + "." + m[2] + "." + m[1] : go.date;
+        var cell = Array.prototype.find.call(document.querySelectorAll("td, div, span"), function (el) { return el.children.length === 0 && txt(el) === d; });
+        if (!cell) return;
+        var row = cell.closest("tr") || cell.parentElement;
+        flash(row);
+        row.dispatchEvent(new MouseEvent("dblclick", { bubbles: true, cancelable: true, view: window }));
+        done(); return;
+      }
+      // задача в дереве: самый глубокий элемент, текст которого — название задачи
+      var t = norm(go.title);
+      if (!t) { done(); return; }
+      var hit = null;
+      Array.prototype.forEach.call(document.querySelectorAll("div, span, p, h3, h4"), function (el) {
+        if (norm(txt(el)) === t && (!hit || hit.contains(el))) hit = el;
+      });
+      if (!hit) return;
+      var card = hit.closest("[data-id], .tt-node, .node, article") || hit.parentElement || hit;
+      flash(card);
+      done();
+    }, 250);
+    try {
+      localStorage.setItem("okr-role-session", JSON.stringify(H.session));
+      localStorage.setItem("okr-lang", H.lang === "en" ? "en" : "ru");
+    } catch (e) {}
+  })();
+</script>
+</head>
+<body>
+  <div id="root"></div>
+  <script>
+    if (window.__OKR_NO_HOST) document.getElementById("root").innerHTML =
+      '<p style="font:15px system-ui,sans-serif;padding:32px;color:#14302D">Откройте модуль «Стратегия» из портала Evolution Platform.</p>';
+    else document.write('<script src="okr-app.js?v=20261103a"><\/script>');
+  </script>
+<div id="evo-staging-badge" style="position:fixed;left:8px;bottom:8px;z-index:2147483647;padding:4px 10px;border-radius:6px;background:#b42318;color:#fff;font:600 12px/1.4 system-ui,sans-serif;letter-spacing:.04em;pointer-events:none;opacity:.92">TEST / STAGING · e6e9a4d</div></body>
+</html>
