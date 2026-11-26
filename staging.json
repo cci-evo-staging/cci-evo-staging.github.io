@@ -1,0 +1,11 @@
+{
+  "environment": "staging",
+  "app_commit": "d688e72e76d692d0a06c7c8383b50ac096422e9c",
+  "tooling_commit": "d688e72e76d692d0a06c7c8383b50ac096422e9c",
+  "build_run": "45778746445",
+  "project_ref": "rahindpqzsrizmmmmfdo",
+  "csp": "connect-src 'self' https://rahindpqzsrizmmmmfdo.supabase.co wss://rahindpqzsrizmmmmfdo.supabase.co; img-src 'self' data: blob: https://rahindpqzsrizmmmmfdo.supabase.co; media-src 'self' blob: https://rahindpqzsrizmmmmfdo.supabase.co; frame-src 'self' blob:; worker-src 'self' blob:; form-action 'self'",
+  "hosting": "github-pages",
+  "hostname": "cci-evo-staging.github.io",
+  "built_at": "2026-11-26T07:55:40.877Z"
+}

@@ -1,0 +1,107 @@
+/* Evolution CCI · модуль «Стратегия»: тема платформы поверх приложения OKR-Tree2026 (17.10.2026).
+   Сборку okr-app.js не трогаем. Приложение задаёт свои цвета классами с !important и переменными на :root,
+   поэтому здесь те же классы с более сильным селектором (html body …) и переменные на html:root.
+   Палитра и шрифты — как у оболочки и модуля «Процессы»: фон #F2F4F1, карточки белые, акцент #004643,
+   Manrope (заголовки), Golos Text (текст), JetBrains Mono (служебное). Цвета треков и продуктов не меняем — это смысловые цвета данных. */
+html:root{
+  --cc-mist:#F2F4F1; --cc-sage:#8E9A95; --cc-sage-soft:#D8DDD8; --cc-border:#BCC5C0;
+  --cc-green-3:#DDECEA; --cc-green-4:#EEF5F3;
+  --cc-font-base:'Golos Text',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --cc-font-accent:'Manrope','Golos Text',system-ui,sans-serif;
+  --m3-bg:#F2F4F1; --m3-side:#E9ECE8; --m3-sel:#DDECEA;
+  --ecci-ink:#18211E; --ecci-ink-2:#3A4642; --ecci-muted:#5C6964; --ecci-line:#D8DDD8; --ecci-line-2:#BCC5C0;
+  --ecci-sunk:#E9ECE8; --ecci-accent:#004643; --ecci-accent-soft:#DDECEA;
+}
+html, body{background:#F2F4F1}
+/* скругление как в платформе (переключатель «Мягко / Строго» скрыт) */
+html body [style*="--ui-r"]{--ui-r:12px!important}
+html body .okr-app-root{background:#F2F4F1;color:var(--ecci-ink)}
+html body code, html body .font-mono{font-family:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace}
+
+/* заголовки: вместо курсивного засечного — Manrope */
+html body [style*="cc-font-accent"]{font-style:normal!important;font-weight:700!important;letter-spacing:-.01em;color:var(--ecci-ink)}
+html body h1[style*="cc-font-accent"]{font-weight:800!important}
+/* радужная линия под шапкой → тонкая линия, как в оболочке */
+html body [style*="cc-rainbow"]{background:var(--ecci-line)!important;height:1px!important;opacity:1!important}
+
+/* боковая панель и навигация */
+html body .okr-aside{background:var(--ecci-sunk)}
+html body .okr-nav-tile{color:var(--ecci-ink-2)!important;border-radius:10px!important}
+html body .okr-nav-tile:hover{background:rgba(0,70,67,.07)!important}
+html body .okr-nav-tile.active{background:var(--ecci-accent-soft)!important;color:var(--ecci-accent)!important}
+
+/* переключатель разделов — «таблетки» как «Таблица / Иерархия» в «Процессах» */
+html body .okr-seg{background:var(--ecci-sunk);border-radius:12px;padding:3px}
+html body .okr-seg button{border-radius:9px;color:var(--ecci-muted)}
+html body .okr-seg button:hover{background:rgba(0,70,67,.06)}
+html body .okr-seg button.on{background:#fff!important;color:var(--ecci-ink)!important;box-shadow:0 1px 2px rgba(16,40,36,.08)}
+
+/* серая шкала: фон */
+html body .bg-neutral-50{background-color:#F5F7F4!important}
+html body .bg-neutral-100{background-color:#E9ECE8!important}
+html body .bg-neutral-150{background-color:#E1E5E0!important}
+html body .bg-neutral-200{background-color:#D8DDD8!important}
+html body .bg-neutral-400{background-color:#8E9A95!important}
+html body .bg-neutral-800{background-color:#26302C!important}
+html body .bg-neutral-900{background-color:#004643!important}
+html body .hover\:bg-neutral-50:hover{background-color:#F5F7F4!important}
+html body .hover\:bg-neutral-100:hover{background-color:#E9ECE8!important}
+html body .hover\:bg-neutral-200:hover{background-color:#D8DDD8!important}
+html body .hover\:bg-neutral-800:hover{background-color:#003633!important}
+/* серая шкала: текст */
+html body .text-neutral-300{color:#A7B1AC!important}
+html body .text-neutral-400{color:#8E9A95!important}
+html body .text-neutral-500{color:#5C6964!important}
+html body .text-neutral-600{color:#47534F!important}
+html body .text-neutral-700{color:#3A4642!important}
+html body .text-neutral-800{color:#26302C!important}
+html body .text-neutral-900{color:#18211E!important}
+html body .hover\:text-neutral-600:hover{color:#47534F!important}
+html body .hover\:text-neutral-700:hover{color:#3A4642!important}
+html body .hover\:text-neutral-800:hover{color:#26302C!important}
+/* серая шкала: рамки */
+html body .border-neutral-100{border-color:#E9ECE8!important}
+html body .border-neutral-200{border-color:#D8DDD8!important}
+html body .border-neutral-300{border-color:#BCC5C0!important}
+html body .border-neutral-400{border-color:#A7B1AC!important}
+html body .border-neutral-800{border-color:#26302C!important}
+html body .border-neutral-900{border-color:#004643!important}
+/* лаймовые подсветки выбора → мягкий акцент */
+html body .bg-emerald-100,html body .bg-teal-100{background-color:#DDECEA!important}
+html body .hover\:bg-emerald-200:hover{background-color:#CFE3E0!important}
+
+/* OKR-дерево: линии и фон полотна */
+html body .tt{--tt-line:#D8DDD8;--tt-muted:#5C6964;--tt-bg:#F2F4F1}
+html body .tt-btn{border-color:var(--ecci-line);color:var(--ecci-ink)}
+html body .tt-btn:hover{border-color:var(--ecci-line-2)}
+
+/* поля ввода */
+html body input:not([type=checkbox]):not([type=radio]),html body select,html body textarea{border-color:var(--ecci-line)}
+html body input:focus,html body select:focus,html body textarea:focus{outline:2px solid rgba(0,70,67,.18);outline-offset:0}
+
+/* невысокие экраны (ноутбук при 100 %): плотнее */
+@media (max-height:820px){
+  html body .okr-aside > div{padding-top:12px!important;padding-bottom:12px!important}
+  html body .tt-wrap{height:calc(100vh - 230px);min-height:320px}
+}
+
+/* ---- второй проход (17.10.2026): приёмы «Процессов» заметнее ---- */
+/* кнопки — без рамки, на серой подложке, как «Загрузить из Excel» */
+html body .okr-app-root button.border:not(.okr-track-chip):not(.okr-chip-on),
+html body .tt-btn{border-color:transparent!important;background-color:#E9ECE8;color:#18211E;border-radius:10px!important;font-weight:500}
+html body .okr-app-root button.border:not(.okr-track-chip):hover,
+html body .tt-btn:hover{background-color:#DFE3DE!important}
+html body .okr-app-root button.border:disabled,html body .tt-btn:disabled{background-color:#EEF0EC;color:#A7B1AC}
+/* карточки — белые без рамки на сером фоне */
+html body .okr-app-root .rounded-xl.border.bg-white,html body .okr-app-root .rounded-2xl.border.bg-white,
+html body .okr-app-root .rounded-lg.border.bg-white{border-color:transparent!important}
+html body .tt-wrap{border-color:transparent}
+/* поля — серые без рамки */
+html body .okr-app-root input:not([type=checkbox]):not([type=radio]),html body .okr-app-root select,html body .okr-app-root textarea{background-color:#E9ECE8;border-color:transparent!important;border-radius:10px}
+html body .okr-app-root input:focus,html body .okr-app-root select:focus,html body .okr-app-root textarea:focus{background-color:#fff}
+/* заголовок экрана — крупный, как «Реестр процессов» */
+html body h1[style*="cc-font-accent"]{font-size:26px!important;line-height:1.15}
+html body [style*="cc-rainbow"]{display:none!important}
+/* поле поиска с иконкой: рамка-обёртка становится серой подложкой, само поле прозрачное */
+html body .okr-app-root div.border:has(> input:not([type=checkbox]):not([type=radio])){background-color:#E9ECE8!important;border-color:transparent!important}
+html body .okr-app-root div.border:has(> input:not([type=checkbox]):not([type=radio])) > input{background-color:transparent}
